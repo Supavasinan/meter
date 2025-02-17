@@ -1,10 +1,10 @@
 "use client";
 
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { LucideProps } from "lucide-react";
 import React, { ForwardRefExoticComponent, RefAttributes } from "react";
@@ -19,8 +19,6 @@ type Props = {
   unit: string;
   children?: React.ReactNode;
 };
-
-
 
 const chartData = [{ date: "2024-04-01", value: 222 }];
 const chartConfig = {
@@ -55,7 +53,7 @@ export const PowerCard = ({
           <Icon className="size-6" />
         </div>
       </div>
-      {/* {children} */}
+      {children}
       <ChartContainer
         config={chartConfig}
         className="aspect-auto h-[80px] w-full mt-4"
