@@ -27,7 +27,7 @@ interface DatePickerProps {
   data?: SensorData[];
 }
 
-export function DatePicker({ data = [] }: DatePickerProps) {
+export function DateFilter({ data = [] }: DatePickerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -65,12 +65,12 @@ export function DatePicker({ data = [] }: DatePickerProps) {
 
   // Calculate the minimum and maximum selectable dates.
   const minDate = React.useMemo(() => {
-    const minTime = dateRange.data?.min?.[0]?._time;
+    const minTime = dateRange.data?.min?.time;
     return minTime ? new Date(minTime) : undefined;
   }, [dateRange.data]);
 
   const maxDate = React.useMemo(() => {
-    const maxTime = dateRange.data?.max?.[0]?._time;
+    const maxTime = dateRange.data?.max?.time;
     return maxTime ? new Date(maxTime) : undefined;
   }, [dateRange.data]);
 

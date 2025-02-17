@@ -20,7 +20,10 @@ const app = new Hono().get("/", async (c) => {
   const resultMin = await influxQuery(fluxQueryMin);
   const resultMax = await influxQuery(fluxQueryMax);
 
-  return c.json({ min: resultMin, max: resultMax });
+  return c.json({
+    min: { time: resultMin[0]._time },
+    max: { time: resultMax[0]._time },
+  });
 });
 
 export default app;

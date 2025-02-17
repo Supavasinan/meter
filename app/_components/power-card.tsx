@@ -6,8 +6,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { format } from "date-fns";
 import { LucideProps } from "lucide-react";
-import React, { ForwardRefExoticComponent, RefAttributes } from "react";
+import React, {
+  ForwardRefExoticComponent,
+  RefAttributes,
+  useState,
+} from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 type Props = {
@@ -17,10 +22,17 @@ type Props = {
   label: string;
   value: number;
   unit: string;
+  timeSeries?:
+    | {
+        time: string;
+        value: number;
+      }[]
+    | undefined;
   children?: React.ReactNode;
 };
 
 const chartData = [{ date: "2024-04-01", value: 222 }];
+
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -40,14 +52,22 @@ export const PowerCard = ({
   label,
   value,
   unit,
+  timeSeries,
   children,
 }: Props) => {
+  // Use provided timeSeries data if available; otherwise fallback to dummy data.
+  const data =
+    timeSeries?.map((d) => ({ date: d.time, value: d.value })) || chartData;
+
+  // Store the currently displayed value. Defaults to the prop "value".
+  const [hoveredValue, setHoveredValue] = useState<number>(value);
+
   return (
-    <div className=" border p-4 rounded-xl">
+    <div className="border p-4 rounded-xl">
       <span className="uppercase opacity-55 text-sm">{label}</span>
       <div className="flex justify-between items-center mt-2">
         <p className="font-semibold text-lg">
-          {value} <span className="uppercase">{unit}</span>
+          {hoveredValue.toLocaleString()} <span className="uppercase">{unit}</span>
         </p>
         <div className="border w-fit border-primary rounded-xl p-2 bg-primary/10">
           <Icon className="size-6" />
@@ -58,17 +78,29 @@ export const PowerCard = ({
         config={chartConfig}
         className="aspect-auto h-[80px] w-full mt-4"
       >
-        <AreaChart data={chartData}>
+        <AreaChart
+          data={data}
+          onMouseMove={(state: any) => {
+            if (state?.activePayload && state.activePayload.length) {
+              // Update displayed value based on hovered data point.
+              setHoveredValue(state.activePayload[0].payload.value);
+            }
+          }}
+          onMouseLeave={() => {
+            // Reset to original value when the mouse leaves the chart.
+            setHoveredValue(value);
+          }}
+        >
           <defs>
-            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor="var(--color-desktop)"
+                stopColor="var(--color-mobile)"
                 stopOpacity={0.8}
               />
               <stop
                 offset="95%"
-                stopColor="var(--color-desktop)"
+                stopColor="var(--color-mobile)"
                 stopOpacity={0.1}
               />
             </linearGradient>
@@ -90,14 +122,12 @@ export const PowerCard = ({
             }}
           />
           <ChartTooltip
-            cursor={false}
+            cursor={true}
             content={
               <ChartTooltipContent
-                labelFormatter={(value) => {
-                  return new Date(value).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
+                hideLabel
+                formatter={(value, name, item) => {
+                  return format(new Date(item.payload.date), "HH:mm:ss");
                 }}
                 indicator="dot"
               />

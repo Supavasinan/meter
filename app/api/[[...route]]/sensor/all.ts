@@ -3,24 +3,26 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-const simplifyFluxOutput = (data: any[]): any[] => {
-  const grouped: Record<string, any> = {};
-
-  data.forEach((row) => {
-    const time = row._time;
-    if (!grouped[time]) {
-      grouped[time] = {
-        _start: row._start,
-        _stop: row._stop,
-        _time: row._time,
-      };
-    }
-    // Each field is added as a key with its value.
-    grouped[time][row._field] = row._value;
-  });
-
-  return Object.values(grouped);
+type TimeSeriesItem = {
+  time: string;
+  value: number;
 };
+
+type TimeSeriesData = {
+  current: TimeSeriesItem[];
+  energy: TimeSeriesItem[];
+  pf: TimeSeriesItem[];
+  power: TimeSeriesItem[];
+  voltage: TimeSeriesItem[];
+};
+
+export const simplifyTimeSeriesOutput = (items: any[]): TimeSeriesData =>
+  items.reduce((acc, { _time, _value, _field }) => {
+    const time = new Date(_time).toISOString();
+    if (!acc[_field]) acc[_field] = [];
+    acc[_field].push({ time, value: _value });
+    return acc;
+  }, {} as TimeSeriesData);
 
 const app = new Hono().get(
   "/",
@@ -28,7 +30,6 @@ const app = new Hono().get(
   async (c) => {
     const { date } = c.req.valid("query");
 
-    // Create start and stop times based on the provided date (default to full range).
     const { start, stop } = date
       ? {
           start: `${date}T00:00:00Z`,
@@ -39,7 +40,6 @@ const app = new Hono().get(
           stop: "now()",
         };
 
-    // Build the Flux query using the dynamic time range.
     const fluxQuery = date
       ? `
         from(bucket: "${process.env.INFLUX_BUCKET}")
@@ -53,8 +53,7 @@ const app = new Hono().get(
       `;
 
     const result = await influxQuery(fluxQuery);
-    const simplified = simplifyFluxOutput(result);
-
+    const simplified = simplifyTimeSeriesOutput(result);
     return c.json(simplified);
   }
 );

@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { DatePicker } from "./date-picker";
+import { DateFilter } from "./date-filter";
 
 const data = {
   navMain: [
@@ -48,7 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <DatePicker />
+        <DateFilter />
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter></SidebarFooter>
