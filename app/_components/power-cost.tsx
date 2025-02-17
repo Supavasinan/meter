@@ -3,22 +3,13 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DollarSign } from "lucide-react";
 import { useState } from "react";
+import { PowerCard } from "./power-card";
 
 export const PowerCost = () => {
   const [value, setValue] = useState("");
 
   return (
-    <div className=" border p-4 rounded-xl">
-      <span className="uppercase opacity-55 text-sm">cost</span>
-      <div className="flex justify-between items-center mt-2">
-        <p className="font-semibold text-lg">
-          0.2 <span className="uppercase">USD/H</span>
-        </p>
-        <div className="border w-fit border-primary rounded-xl p-2 bg-primary/10">
-          <DollarSign className="size-6" />
-        </div>
-      </div>
-
+    <PowerCard label="cost" value={0.2} unit="USD/H" icon={DollarSign}>
       <ToggleGroup
         className="flex w-fit gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse"
         type="single"
@@ -41,6 +32,6 @@ export const PowerCost = () => {
           H
         </ToggleGroupItem>
       </ToggleGroup>
-    </div>
+    </PowerCard>
   );
 };

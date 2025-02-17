@@ -23,7 +23,6 @@ export function ThemeToggle() {
       <label
         className="group relative inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-input bg-background text-foreground shadow-sm shadow-black/5 transition-colors hover:bg-accent hover:text-accent-foreground peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-ring/70"
         htmlFor={id}
-        aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       >
         <Moon
           size={16}
