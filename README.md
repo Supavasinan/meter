@@ -36,7 +36,7 @@ Clone the repository and install dependencies:
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-repo/power-tracker.git
+git clone https://github.com/Supavasinan/power-tracker
 cd power-tracker
 
 # Install dependencies
