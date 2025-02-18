@@ -4,14 +4,16 @@
 Welcome to **Power Tracker**! This project is a high-performance dashboard application designed to fetch and display meter data from **MQTT** and **InfluxDB** in real time. With cutting-edge technologies and best practices, this app ensures **scalability, responsiveness, and efficiency**.
 
 ## 🔥 Features
-✅ **Real-time Data Fetching** – Uses **MQTT** for instant updates.  
-✅ **Historical Data** – Fetches and visualizes time-series data from **InfluxDB**.  
-✅ **Responsive Design** – Seamless experience across all devices.  
-✅ **Dynamic Content** – Next.js ensures smooth rendering.  
-✅ **Optimized Performance** – Tailwind CSS for lightweight styling.  
-✅ **Secure Protocols** – Implements WebSocket protocols for secure communication.  
-✅ **UI Components** – Built with **shadcn/ui** for modern, customizable UI elements.  
-✅ **State Management** – Utilizes **TanStack React Query** for advanced data fetching and caching.  
+✅ **Real-time Data Fetching** – Uses **MQTT** for instant updates.\
+✅ **Historical Data** – Fetches and visualizes time-series data from **InfluxDB**.\
+✅ **Live Mode Switch** – Toggle between **live data mode (MQTT)** and **historical mode (InfluxDB)** dynamically.\
+✅ **Responsive Design** – Seamless experience across all devices.\
+✅ **Dark Mode Support** – Fully integrated dark mode for better usability.\
+✅ **Dynamic Content** – Next.js ensures smooth rendering.\
+✅ **Optimized Performance** – Tailwind CSS for lightweight styling.\
+✅ **Secure Protocols** – Implements WebSocket protocols for secure communication.\
+✅ **UI Components** – Built with **shadcn/ui** for modern, customizable UI elements.\
+✅ **State Management** – Utilizes **TanStack React Query** for advanced data fetching and caching.\
 ✅ **Comprehensive Data Visualization** – Displays **Voltage, Current, Power, Energy, and Electricity Cost Calculation** with interactive charts.
 
 ## 🛠️ Tech Stack & Protocols
