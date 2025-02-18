@@ -27,7 +27,7 @@ This project utilizes the following technologies to deliver a powerful user expe
 - **Chart.js/Recharts** – Used for rendering real-time and historical data visualization.
 
 ## 📸 Screenshot
-![Dashboard Preview](https://imgur.com/l5VPeXl)
+![Dashboard Preview](https://imgur.com/l5VPeXl.jpeg)
 
 ## 🚀 Getting Started
 Clone the repository and install dependencies:
