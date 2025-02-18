@@ -3,6 +3,7 @@
 import { SquareTerminal, Zap } from "lucide-react";
 import * as React from "react";
 
+import { LiveModeToggle } from "@/app/_components/live-mode-toggle";
 import { NavMain } from "@/components/nav-main";
 import {
   Sidebar,
@@ -48,6 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <LiveModeToggle />
         <DateFilter />
         <NavMain items={data.navMain} />
       </SidebarContent>

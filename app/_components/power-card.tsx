@@ -1,5 +1,3 @@
-"use client";
-
 import {
   ChartConfig,
   ChartContainer,
@@ -12,6 +10,7 @@ import React, {
   ForwardRefExoticComponent,
   RefAttributes,
   useState,
+  useEffect,
 } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
@@ -54,6 +53,11 @@ export const PowerCard = ({
 
   // Store the currently displayed value. Defaults to the prop "value".
   const [hoveredValue, setHoveredValue] = useState<number>(value);
+
+  // Update hoveredValue when value prop changes.
+  useEffect(() => {
+    setHoveredValue(value);
+  }, [value]);
 
   return (
     <div className="border p-4 rounded-xl">

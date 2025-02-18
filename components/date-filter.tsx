@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useGetDateRange } from "@/project/api/use-get-date-range";
+import { useLiveModeStore } from "@/project/store/live-mode";
 import { format } from "date-fns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
@@ -32,6 +33,7 @@ export function DateFilter({ data = [] }: DatePickerProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const dateRange = useGetDateRange();
+  const { liveMode } = useLiveModeStore();
 
   // Initialize selectedDate from URL query or default to today.
   const initialDate = React.useMemo(() => {
@@ -143,6 +145,8 @@ export function DateFilter({ data = [] }: DatePickerProps) {
           </div>
         ) : (
           <Calendar
+            disabled={liveMode}
+            disableNavigation={liveMode}
             mode="single"
             selected={selectedDate}
             onSelect={handleDateSelect}

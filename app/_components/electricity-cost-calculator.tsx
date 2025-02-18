@@ -1,30 +1,41 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DollarSign, TrendingUp, Zap } from "lucide-react"
-import { useMemo, useState } from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import useSWR from "swr"
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DollarSign, TrendingUp, Zap } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import useSWR from "swr";
 
 const currencies = [
   { code: "THB", symbol: "฿", name: "Thai Baht" },
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "EUR", symbol: "€", name: "Euro" },
-]
+];
 
 const thaiElectricityRates = [
   { range: [0, 150], rate: 3.2484 },
   { range: [151, 400], rate: 4.2218 },
   { range: [401, Number.POSITIVE_INFINITY], rate: 4.4217 },
-]
+];
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface ElectricityCostCalculatorProps {
-  energyData: { time: string; value: number }[]
+  energyData: { time: string; value: number }[];
 }
 
 const chartConfig = {
@@ -39,39 +50,57 @@ const chartConfig = {
   time: {
     label: "Time",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function ElectricityCostCalculator({ energyData }: ElectricityCostCalculatorProps) {
-  const [currency, setCurrency] = useState(currencies[0])
-  const [selectedPoint, setSelectedPoint] = useState<number | null>(null)
+export function ElectricityCostCalculator({
+  energyData,
+}: ElectricityCostCalculatorProps) {
+  const [currency, setCurrency] = useState(currencies[0]);
+  const [isLive, setIsLive] = useState(false);
+  const [liveData, setLiveData] = useState({
+    power: 0,
+    current: 0,
+    voltage: 0,
+    energy: 0,
+    timeSeries: {
+      power: [] as { time: string; value: number }[],
+      current: [] as { time: string; value: number }[],
+      voltage: [] as { time: string; value: number }[],
+      energy: [] as { time: string; value: number }[],
+    },
+  });
 
-  const { data: exchangeRates } = useSWR("https://api.exchangerate-api.com/v4/latest/THB", fetcher, {
-    refreshInterval: 3600000, // Refresh every hour
-    fallbackData: { rates: { THB: 1, USD: 0.03, EUR: 0.025 } },
-  })
+  const { data: exchangeRates } = useSWR(
+    "https://api.exchangerate-api.com/v4/latest/THB",
+    fetcher,
+    {
+      refreshInterval: 3600000, // Refresh every hour
+      fallbackData: { rates: { THB: 1, USD: 0.03, EUR: 0.025 } },
+    }
+  );
 
   const calculateCost = (usage: number): number => {
-    let totalCost = 0
-    let remainingUsage = usage
+    let totalCost = 0;
+    let remainingUsage = usage;
 
     for (const { range, rate } of thaiElectricityRates) {
-      const [min, max] = range
-      const usageInRange = Math.min(Math.max(remainingUsage, 0), max - min)
-      totalCost += usageInRange * rate
-      remainingUsage -= usageInRange
-      if (remainingUsage <= 0) break
+      const [min, max] = range;
+      const usageInRange = Math.min(Math.max(remainingUsage, 0), max - min);
+      totalCost += usageInRange * rate;
+      remainingUsage -= usageInRange;
+      if (remainingUsage <= 0) break;
     }
 
-    return totalCost * (exchangeRates?.rates[currency.code] || 1)
-  }
+    return totalCost * (exchangeRates?.rates[currency.code] || 1);
+  };
 
   const costData = useMemo(() => {
     return energyData.map((entry) => ({
       time: new Date(entry.time).toLocaleString(),
       cost: calculateCost(entry.value),
       usage: entry.value,
-    }))
-  }, [energyData, exchangeRates, currency]) //Corrected dependencies for useMemo
+    }));
+  }, [energyData, exchangeRates, currency]); //Corrected dependencies for useMemo
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("th-TH", {
@@ -79,18 +108,20 @@ export function ElectricityCostCalculator({ energyData }: ElectricityCostCalcula
       currency: currency.code,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
-  const totalCost = costData.reduce((sum, entry) => sum + entry.cost, 0)
-  const averageCost = totalCost / costData.length
-  const predictedCost = calculateCost(energyData.slice(-5).reduce((sum, entry) => sum + entry.value, 0) / 5)
+  const totalCost = costData.reduce((sum, entry) => sum + entry.cost, 0);
+  const averageCost = totalCost / costData.length;
+  const predictedCost = calculateCost(
+    energyData.slice(-5).reduce((sum, entry) => sum + entry.value, 0) / 5
+  );
 
   const costItems = [
     { label: "Total Cost", value: totalCost, icon: DollarSign },
     { label: "Average Cost", value: averageCost, icon: TrendingUp },
     { label: "Predicted Next", value: predictedCost, icon: Zap },
-  ]
+  ];
 
   return (
     <Card className="w-full overflow-hidden">
@@ -99,7 +130,11 @@ export function ElectricityCostCalculator({ energyData }: ElectricityCostCalcula
           <h2 className="text-2xl font-bold">Electricity Cost Calculator</h2>
           <Select
             value={currency.code}
-            onValueChange={(value) => setCurrency(currencies.find((c) => c.code === value) || currencies[0])}
+            onValueChange={(value) =>
+              setCurrency(
+                currencies.find((c) => c.code === value) || currencies[0]
+              )
+            }
           >
             <SelectTrigger className="w-[180px] border-none">
               <SelectValue placeholder="Select currency" />
@@ -115,11 +150,13 @@ export function ElectricityCostCalculator({ energyData }: ElectricityCostCalcula
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {costItems.map((item, index) => (
-            <div key={index} className="p-4 rounded-lg">
-              <Label className="text-xs uppercase tracking-wide mb-2 block">{item.label}</Label>
+            <div key={index} className="p-4 rounded-lg bg-muted/80">
+              <Label className="text-xs opacity-55 uppercase tracking-wide mb-2 block">
+                {item.label}
+              </Label>
               <div className="text-3xl font-bold flex items-center">
                 <item.icon className="mr-2 h-8 w-8" />
-                {formatCurrency(item.value)}
+                {formatCurrency(item.value || 0)}
               </div>
             </div>
           ))}
@@ -129,8 +166,16 @@ export function ElectricityCostCalculator({ energyData }: ElectricityCostCalcula
             <AreaChart data={costData}>
               <defs>
                 <linearGradient id="fillCost" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-cost)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-cost)" stopOpacity={0.1} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-cost)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-cost)"
+                    stopOpacity={0.1}
+                  />
                 </linearGradient>
               </defs>
 
@@ -143,13 +188,24 @@ export function ElectricityCostCalculator({ energyData }: ElectricityCostCalcula
               />
               <YAxis dataKey="cost" />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Area dataKey="cost" type="natural" fill="url(#fillCost)" stroke="var(--color-cost)" stackId="a" />
-              <Area dataKey="usage" type="natural" fill="url(#fillUsage)" stroke="var(--color-usage)" stackId="b" />
+              <Area
+                dataKey="cost"
+                type="natural"
+                fill="url(#fillCost)"
+                stroke="var(--color-cost)"
+                stackId="a"
+              />
+              <Area
+                dataKey="usage"
+                type="natural"
+                fill="url(#fillUsage)"
+                stroke="var(--color-usage)"
+                stackId="b"
+              />
             </AreaChart>
           </ChartContainer>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
