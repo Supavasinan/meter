@@ -36,7 +36,7 @@ This project utilizes the following technologies to deliver a powerful user expe
 ## 📸 Screenshot
 
 ![Dashboard Preview](https://imgur.com/l5VPeXl.jpeg)
-
+https://imgur.com/undefined
 ## 🚀 Getting Started
 
 Clone the repository and install dependencies:
