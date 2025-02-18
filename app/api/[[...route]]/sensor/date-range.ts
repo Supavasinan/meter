@@ -17,13 +17,17 @@ const app = new Hono().get("/", async (c) => {
     |> last()
   `;
 
-  const resultMin = await influxQuery(fluxQueryMin);
-  const resultMax = await influxQuery(fluxQueryMax);
+  try {
+    const resultMin = await influxQuery(fluxQueryMin);
+    const resultMax = await influxQuery(fluxQueryMax);
 
-  return c.json({
-    min: { time: resultMin[0]._time },
-    max: { time: resultMax[0]._time },
-  });
+    return c.json({
+      min: { time: resultMin[0]._time },
+      max: { time: resultMax[0]._time },
+    });
+  } catch (error) {
+    return c.json({ error: "An error occurred" });
+  }
 });
 
 export default app;

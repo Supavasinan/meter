@@ -34,16 +34,9 @@ type Props = {
 const chartData = [{ date: "2024-04-01", value: 222 }];
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
+  value: {
+    label: "Value",
     color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
@@ -67,7 +60,8 @@ export const PowerCard = ({
       <span className="uppercase opacity-55 text-sm">{label}</span>
       <div className="flex justify-between items-center mt-2">
         <p className="font-semibold text-lg">
-          {hoveredValue.toLocaleString()} <span className="uppercase">{unit}</span>
+          {hoveredValue.toLocaleString()}{" "}
+          <span className="uppercase">{unit}</span>
         </p>
         <div className="border w-fit border-primary rounded-xl p-2 bg-primary/10">
           <Icon className="size-6" />
@@ -92,15 +86,15 @@ export const PowerCard = ({
           }}
         >
           <defs>
-            <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="fillValue" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor="var(--color-mobile)"
+                stopColor="var(--color-value)"
                 stopOpacity={0.8}
               />
               <stop
                 offset="95%"
-                stopColor="var(--color-mobile)"
+                stopColor="var(--color-value)"
                 stopOpacity={0.1}
               />
             </linearGradient>
@@ -136,8 +130,8 @@ export const PowerCard = ({
           <Area
             dataKey="value"
             type="natural"
-            fill="url(#fillMobile)"
-            stroke="var(--color-mobile)"
+            fill="url(#fillValue)"
+            stroke="var(--color-value)"
             stackId="a"
           />
         </AreaChart>

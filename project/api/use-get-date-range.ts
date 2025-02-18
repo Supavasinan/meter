@@ -6,7 +6,13 @@ export const useGetDateRange = () => {
     queryKey: ["date-range"],
     queryFn: async () => {
       const response = await client.api.sensor["date-range"].$get();
-      return await response.json();
+    
+      const data = await response.json();
+
+      if ("error" in data) {
+        throw new Error(data.error);
+      }
+      return data;
     },
   });
 };

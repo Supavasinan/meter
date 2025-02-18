@@ -10,7 +10,12 @@ export const useGetSensorByDate = (dateRange: string | undefined) => {
         query: { date: dateRange },
       });
 
-      return await response.json();
+      const data = await response.json();
+
+      if ("error" in data) {
+        throw new Error(data.error);
+      }
+      return data;
     },
   });
 };
