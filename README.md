@@ -1,22 +1,26 @@
 # 🚀 Power Tracker
 
 ## 📌 Introduction
+
 Welcome to **Power Tracker**! This project is a high-performance dashboard application designed to fetch and display meter data from **MQTT** and **InfluxDB** in real time. With cutting-edge technologies and best practices, this app ensures **scalability, responsiveness, and efficiency**.
 
 ## 🔥 Features
-✅ **Real-time Data Fetching** – Uses **MQTT** for instant updates.\
-✅ **Historical Data** – Fetches and visualizes time-series data from **InfluxDB**.\
-✅ **Live Mode Switch** – Toggle between **live data mode (MQTT)** and **historical mode (InfluxDB)** dynamically.\
-✅ **Responsive Design** – Seamless experience across all devices.\
-✅ **Dark Mode Support** – Fully integrated dark mode for better usability.\
-✅ **Dynamic Content** – Next.js ensures smooth rendering.\
-✅ **Optimized Performance** – Tailwind CSS for lightweight styling.\
-✅ **Secure Protocols** – Implements WebSocket protocols for secure communication.\
-✅ **UI Components** – Built with **shadcn/ui** for modern, customizable UI elements.\
-✅ **State Management** – Utilizes **TanStack React Query** for advanced data fetching and caching.\
-✅ **Comprehensive Data Visualization** – Displays **Voltage, Current, Power, Energy, and Electricity Cost Calculation** with interactive charts.
+
+✅ **Real-time Data Fetching** – Uses **MQTT** for instant updates.\  
+✅ **Historical Data** – Fetches and visualizes time-series data from **InfluxDB**.\  
+✅ **Live Mode Switch** – Toggle between **live data mode (MQTT)** and **historical mode (InfluxDB)** dynamically.\  
+✅ **Responsive Design** – Seamless experience across all devices.\  
+✅ **Dark Mode Support** – Fully integrated dark mode for better usability.\  
+✅ **Dynamic Content** – Next.js ensures smooth rendering.\  
+✅ **Optimized Performance** – Tailwind CSS for lightweight styling.\  
+✅ **Secure Protocols** – Implements WebSocket protocols for secure communication.\  
+✅ **UI Components** – Built with **shadcn/ui** for modern, customizable UI elements.\  
+✅ **State Management** – Utilizes **TanStack React Query** for advanced data fetching and caching.\  
+✅ **Comprehensive Data Visualization** – Displays **Voltage, Current, Power, Energy, and Electricity Cost Calculation** with interactive charts.\  
+✅ **API Fetching** – Uses **Hono** for efficient API requests and data management.
 
 ## 🛠️ Tech Stack & Protocols
+
 This project utilizes the following technologies to deliver a powerful user experience:
 
 - **MQTT** – Efficient message queuing for real-time data exchange.
@@ -27,11 +31,14 @@ This project utilizes the following technologies to deliver a powerful user expe
 - **ShadCN UI** – Pre-built UI components for a sleek and accessible design.
 - **TanStack React Query** – Powerful async state management and server state handling.
 - **Chart.js/Recharts** – Used for rendering real-time and historical data visualization.
+- **Hono** – Fast and lightweight web framework for handling API requests.
 
 ## 📸 Screenshot
+
 ![Dashboard Preview](https://imgur.com/l5VPeXl.jpeg)
 
 ## 🚀 Getting Started
+
 Clone the repository and install dependencies:
 
 ```bash
@@ -49,6 +56,7 @@ npm run dev
 Then, open [http://localhost:3000](http://localhost:3000) in your browser to see **Power Tracker** in action! 🚀
 
 ## 📖 Learn More
+
 Explore the documentation for the key technologies used in this project:
 
 - [Next.js Documentation](https://nextjs.org/docs)
@@ -60,11 +68,7 @@ Explore the documentation for the key technologies used in this project:
 - [TanStack React Query Documentation](https://tanstack.com/query/latest/docs/react)
 - [Chart.js Documentation](https://www.chartjs.org/docs/latest/)
 - [Recharts Documentation](https://recharts.org/en-US/)
-
-## 🌍 Deploy on Vercel
-Easily deploy your Next.js app on **Vercel** for seamless hosting and scaling.
-
-Read more: [Next.js Deployment Guide](https://nextjs.org/docs/deployment)
+- [Hono Documentation](https://hono.dev/)
 
 ---
 
