@@ -2,31 +2,38 @@ import { influxQuery } from "@/lib/influxdb";
 import { Hono } from "hono";
 
 const app = new Hono().get("/", async (c) => {
-  const fluxQueryMin = `
+  const fluxQuery = `
     from(bucket: "${process.env.INFLUX_BUCKET}")
       |> range(start: 0)
-      |> filter(fn: (r) => r._field == "pf")
-      |> group()
-      |> first()
-  `;
-  const fluxQueryMax = `
-    from(bucket: "${process.env.INFLUX_BUCKET}")
-    |> range(start: 0)
-    |> filter(fn: (r) => r._field == "pf")
-    |> group()
-    |> last()
+      |> group(columns: ["_time"])
+      |> keep(columns: ["_time"])
+      |> distinct(column: "_time")
   `;
 
   try {
-    const resultMin = await influxQuery(fluxQueryMin);
-    const resultMax = await influxQuery(fluxQueryMax);
+    // Execute the query
+    const result = await influxQuery(fluxQuery);
 
-    return c.json({
-      min: { time: resultMin[0]._time },
-      max: { time: resultMax[0]._time },
+    // Check if the result is empty
+    if (!result || result.length === 0) {
+      return c.json(
+        { error: "No data available for the specified field." },
+        404
+      );
+    }
+
+    // Extract unique dates from the results
+    const availableDates = result.map((record) => {
+      const date = new Date(record._time);
+      return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
     });
+    // Remove duplicates and sort the dates
+    const uniqueDates = [...new Set(availableDates)].sort();
+
+    return c.json({ available: uniqueDates });
   } catch (error) {
-    return c.json({ error: "An error occurred" });
+    console.error("Error querying InfluxDB:", error);
+    return c.json({ error: "An error occurred while fetching data." }, 500);
   }
 });
 

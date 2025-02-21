@@ -10,13 +10,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { useGetDateRange } from "@/project/api/use-get-date-range";
 import { useLiveModeStore } from "@/project/store/live-mode";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
 import * as React from "react";
-import { DayContent } from "react-day-picker";
+import { DayContent, type DayContentProps } from "react-day-picker";
 
 interface SensorData {
   _time: string;
@@ -35,48 +36,41 @@ export function DateFilter({ data = [] }: DatePickerProps) {
   const dateRange = useGetDateRange();
   const { liveMode } = useLiveModeStore();
 
-  // Initialize selectedDate from URL query or default to today.
-  const initialDate = React.useMemo(() => {
-    const dateParam = searchParams.get("date");
-    return dateParam ? new Date(dateParam) : new Date();
-  }, [searchParams]);
+  // Convert available dates string array to Date objects
+  const availableDates = React.useMemo(() => {
+    return dateRange.data?.available?.map((dateStr) => new Date(dateStr)) || [];
+  }, [dateRange.data]);
 
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    initialDate
+    undefined
   );
 
-  // Helper function to update the URL query parameter.
-  const updateDateInQuery = React.useCallback(
-    (date: Date) => {
-      const formattedDate = format(date, "yyyy-MM-dd");
+  // Initialize date when data is available
+  React.useEffect(() => {
+    if (availableDates.length > 0) {
+      const dateParam = searchParams.get("date");
+      let dateToSelect: Date;
+
+      if (dateParam) {
+        const paramDate = new Date(dateParam);
+        dateToSelect = availableDates.some((d) => isSameDay(d, paramDate))
+          ? paramDate
+          : availableDates[0];
+      } else {
+        dateToSelect = availableDates[0];
+      }
+
+      setSelectedDate(dateToSelect);
+      const formattedDate = format(dateToSelect, "yyyy-MM-dd");
       const url = qs.stringifyUrl(
         { url: pathname, query: { date: formattedDate } },
         { skipEmptyString: true, skipNull: true }
       );
       router.push(url);
-    },
-    [pathname, router]
-  );
-
-  // Ensure the URL has a "date" query param.
-  React.useEffect(() => {
-    if (!searchParams.get("date")) {
-      updateDateInQuery(new Date());
     }
-  }, [searchParams, updateDateInQuery]);
+  }, [availableDates, searchParams, pathname, router]);
 
-  // Calculate the minimum and maximum selectable dates.
-  const minDate = React.useMemo(() => {
-    const minTime = dateRange.data?.min?.time;
-    return minTime ? new Date(minTime) : undefined;
-  }, [dateRange.data]);
-
-  const maxDate = React.useMemo(() => {
-    const maxTime = dateRange.data?.max?.time;
-    return maxTime ? new Date(maxTime) : undefined;
-  }, [dateRange.data]);
-
-  // Group sensor data by day (formatted as "yyyy-MM-dd").
+  // Group sensor data by day
   const groupedData = React.useMemo(() => {
     return data.reduce<Record<string, SensorData[]>>((groups, item) => {
       const dayKey = format(new Date(item._time), "yyyy-MM-dd");
@@ -87,22 +81,30 @@ export function DateFilter({ data = [] }: DatePickerProps) {
   }, [data]);
 
   const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      updateDateInQuery(date);
+    if (date && availableDates.some((d) => isSameDay(d, date))) {
+      setSelectedDate(date);
+      const formattedDate = format(date, "yyyy-MM-dd");
+      const url = qs.stringifyUrl(
+        { url: pathname, query: { date: formattedDate } },
+        { skipEmptyString: true, skipNull: true }
+      );
+      router.push(url);
     }
   };
 
-  // Custom day component for displaying sensor data as a tooltip.
-  const CustomDay = (props: React.ComponentProps<typeof DayContent>) => {
+  // Custom day component for displaying sensor data as a tooltip
+  const CustomDay = (props: DayContentProps) => {
     const { date } = props;
     const dayKey = format(date, "yyyy-MM-dd");
     const dayData = groupedData[dayKey];
+    const isAvailable = availableDates.some((d) => isSameDay(d, date));
 
     return (
-      <div className="relative">
+      <div
+        className={cn("relative ", !isAvailable && "text-muted-foreground/50")}
+      >
         <DayContent {...props} />
-        {dayData && dayData.length > 0 && (
+        {isAvailable && dayData && dayData.length > 0 && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -127,6 +129,40 @@ export function DateFilter({ data = [] }: DatePickerProps) {
     );
   };
 
+  // Define modifiers for available dates
+  const modifiers = React.useMemo(
+    () => ({
+      available: availableDates,
+      unavailable: (date: Date) =>
+        !availableDates.some((d) => isSameDay(d, date)),
+    }),
+    [availableDates]
+  );
+
+  // Define modifier styles
+  const modifiersStyles = {
+    available: {
+      fontWeight: "600",
+    },
+    unavailable: {
+      opacity: "0.5",
+      cursor: "not-allowed",
+    },
+  };
+
+  // Calculate the minimum and maximum selectable dates
+  const minDate = React.useMemo(() => {
+    return availableDates.length > 0
+      ? new Date(Math.min(...availableDates.map((d) => d.getTime())))
+      : undefined;
+  }, [availableDates]);
+
+  const maxDate = React.useMemo(() => {
+    return availableDates.length > 0
+      ? new Date(Math.max(...availableDates.map((d) => d.getTime())))
+      : undefined;
+  }, [availableDates]);
+
   return (
     <SidebarGroup className="px-0">
       <SidebarGroupContent>
@@ -145,7 +181,9 @@ export function DateFilter({ data = [] }: DatePickerProps) {
           </div>
         ) : (
           <Calendar
-            disabled={liveMode}
+            disabled={(date) =>
+              liveMode || !availableDates.some((d) => isSameDay(d, date))
+            }
             disableNavigation={liveMode}
             mode="single"
             selected={selectedDate}
@@ -153,7 +191,10 @@ export function DateFilter({ data = [] }: DatePickerProps) {
             className="[&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground [&_[role=gridcell]]:w-[33px]"
             fromDate={minDate}
             toDate={maxDate}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
             components={{ DayContent: CustomDay }}
+            defaultMonth={selectedDate}
           />
         )}
       </SidebarGroupContent>

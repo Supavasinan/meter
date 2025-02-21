@@ -120,7 +120,7 @@ export default function Home() {
                   ))}
             </div>
             <div className="rounded-xl bg-muted/50 p-4">
-              <ElectricityCostCalculator energyData={dataSource.energy} />
+              <ElectricityCostCalculator powerData={dataSource.power} />
             </div>
           </div>
         </SidebarInset>
